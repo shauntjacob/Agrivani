@@ -1,0 +1,313 @@
+.explorePage {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 40px 24px 60px 24px;
+    gap: 36px;
+
+    /* Scrollbar */
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #bdbdbd;
+        border-radius: 3px;
+    }
+
+    /* ── Hero ── */
+    .exploreHero {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        margin-top: 8px;
+
+        .heroLeaf {
+            color: #43a047;
+            opacity: 0.7;
+        }
+
+        h1 {
+            font-size: 30px;
+            font-weight: 700;
+            color: var(--agri-primary);
+            letter-spacing: 0.5px;
+        }
+
+        .heroSub {
+            font-size: 15px;
+            color: #5d6d5e;
+            font-weight: 400;
+            max-width: 420px;
+        }
+    }
+
+    /* ── Shared section wrapper ── */
+    .exploreSection {
+        width: 100%;
+        max-width: 780px;
+
+        h2 {
+            font-size: 19px;
+            font-weight: 700;
+            color: var(--agri-primary);
+            margin-bottom: 16px;
+            padding-left: 4px;
+            letter-spacing: 0.3px;
+        }
+    }
+
+    /* ── About ── */
+    .aboutSection {
+        background: rgba(255, 255, 255, 0.42);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.55);
+        border-radius: 20px;
+        padding: 28px 28px 24px 28px;
+
+        p {
+            font-size: 15px;
+            color: #3d3d3d;
+            line-height: 1.7;
+        }
+    }
+
+    /* ── Features Grid ── */
+    .featuresSection {
+        .featuresGrid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .featureCard {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 18px;
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.62);
+                box-shadow: 0 4px 18px rgba(46, 125, 50, 0.14);
+                transform: translateY(-2px);
+            }
+
+            .featureIcon {
+                width: 48px;
+                height: 48px;
+                border-radius: 14px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .chatIcon {
+                background: var(--bg-hover);
+                color: var(--agri-primary);
+            }
+
+            .weatherIcon {
+                background: var(--bg-input);
+                color: #1565c0;
+            }
+
+            .imageIcon {
+                background: var(--bg-main);
+                color: #c62828;
+            }
+
+            .voiceIcon {
+                background: var(--bg-hover);
+                color: #4527a0;
+            }
+
+            h3 {
+                font-size: 15px;
+                font-weight: 600;
+                color: #2d2d2d;
+            }
+
+            p {
+                font-size: 13px;
+                color: #6d6d6d;
+                line-height: 1.55;
+            }
+        }
+    }
+
+    /* ── Getting Started Steps ── */
+    .stepsSection {
+        .stepsList {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .stepItem {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: background 0.2s ease;
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.58);
+            }
+
+            .stepNumber {
+                width: 38px;
+                height: 38px;
+                min-width: 38px;
+                border-radius: 50%;
+                background: var(--agri-primary);
+                color: var(--text-white);
+                font-size: 17px;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .stepContent {
+                flex: 1;
+
+                h3 {
+                    font-size: 15px;
+                    font-weight: 600;
+                    color: #2d2d2d;
+                    margin-bottom: 3px;
+                }
+
+                p {
+                    font-size: 13px;
+                    color: var(--text-secondary);
+                }
+            }
+
+            .stepArrow {
+                color: #a5d6a7;
+            }
+        }
+    }
+
+    /* ── Footer ── */
+    .exploreFooter {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #66bb6a;
+        font-size: 13px;
+        font-weight: 500;
+        opacity: 0.75;
+        margin-top: auto;
+    }
+}
+
+/* ============================================
+   TABLETS
+   ============================================ */
+@media (max-width: 1024px) {
+    .explorePage {
+        padding: 32px 20px 50px 20px;
+    }
+}
+
+/* ============================================
+   MOBILE
+   ============================================ */
+@media (max-width: 768px) {
+    .explorePage {
+        padding: 28px 16px 48px 16px;
+        gap: 28px;
+
+        .exploreHero {
+            h1 {
+                font-size: 24px;
+            }
+
+            .heroSub {
+                font-size: 14px;
+            }
+        }
+
+        .exploreSection {
+            h2 {
+                font-size: 17px;
+            }
+        }
+
+        .aboutSection {
+            padding: 22px 20px 18px 20px;
+
+            p {
+                font-size: 14px;
+            }
+        }
+
+        .featuresSection .featuresGrid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .stepsSection .stepItem {
+            padding: 16px 16px;
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .explorePage {
+        padding: 22px 12px 40px 12px;
+        gap: 22px;
+
+        .exploreHero {
+            h1 {
+                font-size: 21px;
+            }
+
+            .heroSub {
+                font-size: 13px;
+            }
+        }
+
+        .aboutSection {
+            padding: 18px 16px;
+            border-radius: 16px;
+        }
+
+        .featuresSection .featureCard {
+            padding: 18px 16px;
+            border-radius: 14px;
+        }
+
+        .stepsSection .stepItem {
+            padding: 14px;
+            border-radius: 13px;
+            gap: 12px;
+
+            .stepNumber {
+                width: 32px;
+                height: 32px;
+                min-width: 32px;
+                font-size: 15px;
+            }
+        }
+    }
+}

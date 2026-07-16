@@ -1,0 +1,240 @@
+.settings-page {
+    padding: 24px;
+    height: 100%;
+    overflow-y: auto;
+    background-color: var(--agri-bg-soft);
+}
+
+.settings-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.settings-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--agri-text);
+}
+
+.status-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    animation: slideIn 0.3s ease;
+}
+
+.status-pill.success {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+.status-pill.error {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 24px;
+}
+
+.settings-card {
+    background: var(--agri-card-bg);
+    border: 1px solid var(--agri-border);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease;
+}
+
+.settings-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    color: var(--agri-primary);
+}
+
+.card-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--agri-text);
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #64748b;
+    margin-bottom: 8px;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 12px;
+    color: #94a3b8;
+}
+
+.input-wrapper input {
+    width: 100%;
+    padding: 12px 12px 12px 40px;
+    background: var(--agri-bg-soft);
+    border: 1.5px solid var(--agri-border);
+    border-radius: 12px;
+    font-size: 15px;
+    color: var(--agri-text);
+    transition: all 0.2s ease;
+}
+
+.input-wrapper input:focus {
+    border-color: var(--agri-primary-light);
+    background: var(--bg-card);
+    /* Theme-aware background */
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.05);
+}
+
+.save-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--agri-primary);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.save-btn:hover:not(:disabled) {
+    background: var(--agri-primary-dark);
+    transform: translateY(-1px);
+}
+
+.save-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.pref-items {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.pref-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: var(--agri-bg-soft);
+    border-radius: 12px;
+}
+
+.pref-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #64748b;
+}
+
+.toggle-pill {
+    padding: 6px 16px;
+    background: #fff;
+    border: 1.5px solid var(--agri-border);
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--agri-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.toggle-pill:hover {
+    border-color: var(--agri-primary-light);
+    background: var(--agri-bg-soft);
+}
+
+/* Specific to security card highlight */
+.settings-card.security .input-wrapper input {
+    border-color: rgba(16, 185, 129, 0.5);
+    /* Increased default visibility */
+    background: var(--bg-card);
+    /* Theme-aware background */
+}
+
+.settings-card.security .input-wrapper input:focus {
+    border-color: var(--agri-primary);
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 768px) {
+    .settings-page {
+        padding: 16px;
+    }
+
+    .settings-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .settings-header h1 {
+        font-size: 20px;
+    }
+}

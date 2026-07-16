@@ -1,0 +1,1055 @@
+/* Agrivani Voice-First Hub Styles */
+
+.agrivani-hub-root {
+  position: fixed;
+  bottom: 0; /* 🌟 CHANGED: From -10px to 0 for a perfectly flush anchor */
+  left: 0;
+  right: 0;
+  width: 100vw;
+  height: 0;
+  /* Zero height to allow mouse wheel events to pass through */
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  /* Anchor content to bottom */
+  pointer-events: none;
+  overflow: visible;
+  /* Allow children to render above the 0-height root */
+  transition:
+    left 0.3s ease,
+    width 0.3s ease;
+}
+
+/* laptop/desktop: Offset hub to the right of the sidebar (320px) */
+@media (min-width: 1025px) {
+  .agrivani-hub-root {
+    left: 320px;
+    width: calc(100vw - 320px);
+  }
+}
+
+/* Large tablets/small laptops: Offset by 300px */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .agrivani-hub-root {
+    left: 300px;
+    width: calc(100vw - 300px);
+  }
+}
+
+.agrivani-hub-root > * {
+  pointer-events: auto;
+}
+
+/* ── Transcription Floating Card ── */
+.transcript-floating-card {
+  position: absolute;
+  bottom: 190px;
+  /* Lowered slightly for better vertical balance */
+  width: 90%;
+  max-width: 500px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid var(--glass-border);
+  border-radius: 28px;
+  padding: 12px 20px;
+  /* Reduced padding for more compact UI */
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  /* Slightly tighter gap */
+  transform-origin: bottom center;
+  z-index: 100;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 5px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--agri-primary-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.verifying-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.main-mic-btn {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--agri-gradient-emerald);
+  border: 4px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(6, 168, 117, 0.4);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 10;
+  position: relative;
+  animation: breathing 4s ease-in-out infinite;
+}
+
+.main-mic-btn:hover {
+  transform: scale(1.1) translateY(-5px);
+  box-shadow: 0 15px 30px rgba(6, 168, 117, 0.5);
+}
+
+.main-mic-btn:active {
+  transform: scale(0.95);
+}
+
+.main-mic-btn:disabled {
+  background: #4b5563 !important; /* Muted grey */
+  box-shadow: none !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+  animation: none !important;
+  filter: grayscale(1);
+}
+
+.card-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+}
+
+.card-action-btn:hover {
+  transform: scale(1.1);
+}
+
+.card-action-btn:active {
+  transform: scale(0.9);
+}
+
+.stop-trigger {
+  background: var(--agri-growth);
+  color: white;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+}
+
+.confirm-trigger {
+  background: var(--agri-primary);
+  color: white;
+  box-shadow: 0 4px 10px rgba(4, 120, 87, 0.3);
+}
+
+.cancel-trigger:hover {
+  background: #fecaca;
+  transform: scale(1.1);
+}
+
+/* ── Waveform Visualizer ── */
+.waveform-visualizer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 30px;
+  width: 100%;
+  margin-top: 10px;
+  opacity: 0;
+  transform: scaleY(0.5);
+  transition: all 0.3s ease;
+}
+
+.waveform-visualizer.active {
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+.ui-state-listening .wave-bar {
+  background: #ff4d4d;
+}
+
+/* ── Transcription Text Area ── */
+.transcript-content-area {
+  padding: 4px 0;
+}
+
+.transcript-display {
+  min-height: 24px;
+}
+
+.editable-text.editing-mode {
+  background: var(--bg-card);
+  border: 2px solid var(--agri-primary-light);
+  box-shadow: var(--shadow-md);
+  min-height: 60px;
+}
+
+/* ── Card Footer Actions ── */
+.card-footer-actions {
+  display: flex;
+  justify-content: center;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-light);
+}
+
+.footer-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 50px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.footer-action-btn:hover {
+  transform: translateY(-2px);
+}
+
+.footer-action-btn:active {
+  transform: scale(0.95);
+}
+
+.dual-actions,
+.review-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.dual-actions .footer-action-btn,
+.review-actions .footer-action-btn {
+  flex: 1;
+  justify-content: center;
+}
+
+.stop-trigger {
+  background: var(--agri-primary);
+  color: white;
+  width: 100%;
+}
+
+.edit-btn {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+}
+
+.cancel-btn {
+  background: #ffeeee;
+  color: #ef4444;
+}
+
+/* ── Dynamic States ── */
+.ui-state-listening .main-mic-btn {
+  background: var(--agri-gradient-alert);
+  animation: pulse-alert 1.5s infinite;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.ui-state-listening .main-mic-btn svg {
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+}
+
+.ui-state-listening .pulse-dot {
+  background: #ff4d4d;
+  box-shadow: 0 0 10px #ff4d4d;
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  background: #4ade80;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #4ade80;
+  animation: simple-pulse 1.5s infinite;
+}
+
+.live-text {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.edit-area {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.editable-text {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  padding: 10px 12px;
+  /* Tighter padding */
+  outline: none;
+  font-size: 1.05rem;
+  /* Slightly smaller font */
+  font-weight: 500;
+  color: var(--text-primary);
+  font-family: inherit;
+  resize: none;
+  min-height: 60px;
+  /* Reduced from 80px */
+  transition: all 0.2s;
+}
+
+.editable-text:focus {
+  background: var(--bg-card);
+  border-color: var(--agri-primary-light);
+  box-shadow: 0 0 0 4px rgba(6, 150, 108, 0.1);
+}
+
+.edit-hint {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  text-align: right;
+  margin-top: -4px;
+}
+
+/* ── Agrivani Bottom Panel (Arched Command Stage) ── */
+.agrivani-panel {
+  width: 140vw;
+  /* Immersive edge-to-edge curvature */
+  height: 140px;
+  /* Lowered sleeker profile as requested */
+  background: radial-gradient(circle at center 20%, #0e6b3a 0%, #064e3b 80%);
+  border-radius: 50% 50% 0 0;
+  /* Distinct semi-circle boundary */
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding-bottom: 30px;
+  /* Pull buttons down slightly */
+  z-index: 10;
+  box-shadow:
+    0 -20px 50px rgba(0, 0, 0, 0.3),
+    inset 0 2px 20px rgba(255, 255, 255, 0.05);
+  border-top: 2px solid var(--agri-primary-light);
+  /* Definition for the straddle edge - refined for theme */
+  pointer-events: auto;
+}
+
+/* ── Unified Floating Hub Card ── */
+.unified-hub-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-image-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 16px;
+  margin-bottom: 4px;
+}
+
+.image-loading-card {
+  position: absolute;
+  bottom: 215px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  padding: 12px 20px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+  color: var(--agri-primary-dark);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  z-index: 110;
+}
+
+.loading-spinner-small {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(6, 150, 108, 0.2);
+  border-top: 3px solid var(--agri-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Vertical shift logic is handled by dynamic content height in the unified card */
+.unified-hub-card {
+  bottom: 190px;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.preview-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.preview-img-display {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.analyze-send-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.analyze-send-btn:hover {
+  transform: translateY(-2px);
+}
+
+.panel-content {
+  position: absolute;
+  width: 100vw;
+  /* Explicitly use viewport width to avoid 140vw inheritance */
+  max-width: 650px;
+  height: 100%;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  z-index: 20;
+}
+
+@media (max-width: 480px) {
+  .panel-content {
+    max-width: 100%;
+    padding: 0 10px;
+    /* Prevent icons from touching edges */
+  }
+}
+
+/* 
+   The True Semi-Circle Raised Stage 
+   Pronounced arch boundary that stretches edge-to-edge.
+*/
+/* Old before pseudoelement removed as background is now on panel */
+.agrivani-bottom-panel::before {
+  display: none;
+}
+
+/* ── Buttons (Arc-Aligned Positioning) ── */
+.hub-nav-item {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 15;
+}
+
+.btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  filter: grayscale(1);
+  pointer-events: none;
+}
+
+.btn-disabled .circle-neumorphic {
+  background: #374151 !important;
+  box-shadow: none !important;
+}
+
+.btn-disabled .btn-label {
+  color: #9ca3af !important;
+}
+
+/* Arc-Aligned Layout - Symmetrical Orbit Icons (Manual Curve Tracing) */
+.upload-wrap {
+  position: absolute;
+  left: 6%;
+  bottom: 65px;
+  z-index: 15;
+}
+
+.weather-wrap, .scanner-wrap {
+  position: absolute;
+  right: 6%;
+  bottom: 65px;
+  z-index: 15;
+}
+
+.hub-action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.action-popup-menu {
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--glass-bg, rgba(255, 255, 255, 0.9));
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-light, rgba(0, 0, 0, 0.1));
+  border-radius: 12px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  width: max-content;
+  animation: slide-up 0.2s ease-out;
+}
+
+.action-popup-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.action-popup-item:hover {
+  background: var(--bg-hover, rgba(0, 0, 0, 0.05));
+  color: var(--agri-primary);
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@media (max-width: 480px) {
+  .upload-wrap,
+  .weather-wrap, .scanner-wrap {
+    bottom: 55px;
+    left: 8%;
+  }
+
+  .weather-wrap, .scanner-wrap {
+    right: 8%;
+    left: auto;
+  }
+}
+
+.hub-nav-item:active {
+  transform: scale(0.9) translateY(5px);
+}
+
+.circle-neumorphic {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 30% 30%,
+    var(--agri-primary-light),
+    var(--bg-sidebar)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-white);
+  box-shadow:
+    8px 8px 20px rgba(0, 0, 0, 0.3),
+    -4px -4px 12px rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+@media (max-width: 480px) {
+  .circle-neumorphic {
+    width: 52px;
+    height: 52px;
+  }
+
+  .circle-neumorphic svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.hub-nav-item:hover .circle-neumorphic {
+  background: var(--agri-primary);
+  box-shadow:
+    inset 4px 4px 12px rgba(0, 0, 0, 0.4),
+    inset -2px -2px 10px rgba(255, 255, 255, 0.05);
+}
+
+.btn-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--agri-primary-dark);
+  opacity: 1;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+
+@media (max-width: 480px) {
+  .btn-label {
+    font-size: 10px;
+    letter-spacing: 0.5px;
+  }
+}
+
+/* ── Side Button Tooltips ── */
+.hub-nav-item[data-tooltip] {
+  position: absolute;
+}
+
+.hub-nav-item[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: var(--bg-hub-dark);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+}
+
+.hub-nav-item[data-tooltip]:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.central-action-wrap {
+  z-index: 30;
+  position: relative;
+  bottom: 95px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@media (max-width: 480px) {
+  .central-action-wrap {
+    bottom: 100px;
+  }
+}
+
+/* Mobile/Simple Panel state if needed */
+.hub-m.agrivani-panel {
+  width: 100vw;
+  background: var(--bg-hub-dark);
+  padding: 15px 20px 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4);
+  /* Soft curved top for premium look */
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
+  overflow: visible;
+}
+
+/* Add an inner glow to the panel topo border */
+.agrivani-panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(6, 168, 117, 0.3),
+    transparent
+  );
+}
+
+.hub-main-action {
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 30;
+}
+
+@media (max-width: 480px) {
+  .hub-main-action {
+    width: 80px;
+    height: 80px;
+  }
+
+  .hub-main-action svg {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+/* ── AI Orb Effect ── */
+.ai-orb-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 180px;
+  height: 180px;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.ai-orb-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle,
+    rgba(118, 227, 177, 0.4) 0%,
+    rgba(31, 166, 98, 0.1) 50%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  filter: blur(20px);
+  animation: orb-breathe 4s infinite ease-in-out;
+}
+
+.ai-orb-core {
+  position: absolute;
+  top: 25%;
+  left: 25%;
+  right: 25%;
+  bottom: 25%;
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  border-radius: 50%;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@keyframes orb-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+.mic-hint-text {
+  position: absolute;
+  bottom: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--agri-primary-dark);
+  opacity: 1;
+  letter-spacing: 0.5px;
+}
+
+/* ── Primary Mic Button (Hero Element) states ── */
+.hub-main-action.mic-btn {
+  background: #0e6b3a;
+  /* Solid fallback */
+  background-image: linear-gradient(135deg, #1fa662, #0e6b3a);
+  color: white;
+  box-shadow:
+    0 15px 35px rgba(0, 0, 0, 0.4),
+    inset 0 2px 5px rgba(255, 255, 255, 0.3);
+  /* Sharper, more integrated highlight */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  /* Thinner, more subtle border */
+}
+
+.hub-main-action.mic-btn svg {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.hub-main-action.mic-btn:active {
+  transform: scale(0.92);
+}
+
+.hub-main-action.mic-btn.confirm-ready {
+  background: var(--agri-primary);
+  animation: breathing 4s infinite ease-in-out;
+  box-shadow: 0 10px 30px rgba(6, 168, 117, 0.3);
+}
+
+.ai-orb-glow.orb-active {
+  background: radial-gradient(
+    circle,
+    rgba(220, 38, 38, 0.6) 0%,
+    rgba(220, 38, 38, 0.2) 50%,
+    transparent 70%
+  );
+  animation: listening-pulse 2s infinite ease-in-out;
+}
+
+/* Listening State - Pulsing halo */
+.hub-main-action.mic-btn.listening-active {
+  background: #1fa662;
+  box-shadow:
+    0 0 0 0 rgba(31, 166, 98, 0.6),
+    0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: listening-pulse 1.5s infinite ease-out;
+}
+
+@keyframes listening-pulse {
+  0% {
+    box-shadow:
+      0 0 0 0 rgba(31, 166, 98, 0.4),
+      0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  70% {
+    box-shadow:
+      0 0 0 20px rgba(31, 166, 98, 0),
+      0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(31, 166, 98, 0),
+      0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Processing State - Waveform animation handled via .waveform-container */
+.waveform-container {
+  display: flex;
+  gap: 4px;
+  height: 40px;
+}
+
+/* ── Secondary Buttons (Upload & Scanner) ── */
+.hub-btn.circle-neumorphic {
+  background: #059669;
+  /* Distinct emerald green */
+  color: white;
+  /* White icons for high contrast */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.hub-btn.circle-neumorphic:hover {
+  background: #047857;
+  /* Darker green on hover */
+  transform: translateY(-2px);
+}
+
+.hub-btn.circle-neumorphic:active {
+  transform: scale(0.9);
+}
+
+/* Updated Arc Layout for Scanner */
+.scanner-wrap {
+  right: 6%;
+  bottom: 65px;
+}
+
+@media (max-width: 480px) {
+  .scanner-wrap {
+    right: 8%;
+    bottom: 55px;
+  }
+}
+
+/* ── Document Scanner & Ready Card ── */
+.doc-ready-card .card-header {
+  background: rgba(4, 120, 87, 0.07);
+  border-bottom: 1px solid rgba(4, 120, 87, 0.14);
+}
+
+.doc-ready-icon {
+  color: var(--agri-primary, #047857);
+  flex-shrink: 0;
+}
+
+.doc-meta-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.doc-type-badge {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--agri-primary, #047857);
+  color: #fff;
+}
+
+.doc-char-count {
+  font-size: 11px;
+  color: var(--text-tertiary, #94a3b8);
+}
+
+.doc-text-preview {
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--text-secondary, #475569);
+  background: rgba(0, 0, 0, 0.025);
+  border: 1px solid var(--border-light, #e2e8f0);
+  border-radius: 10px;
+  padding: 9px 12px;
+  margin-bottom: 10px;
+  font-family: "Courier New", monospace;
+  max-height: 72px;
+  overflow: hidden;
+  position: relative;
+}
+
+.doc-text-preview::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 28px;
+  background: linear-gradient(transparent, rgba(248, 250, 252, 0.95));
+  border-radius: 0 0 10px 10px;
+  pointer-events: none;
+}
+
+.doc-question-input {
+  min-height: 52px;
+  resize: none;
+}
+
+.hub-btn.btn-scanning {
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+.hub-btn.btn-scan-done {
+  background: var(
+    --agri-gradient-emerald,
+    linear-gradient(135deg, #04845e, #059267)
+  ) !important;
+  color: #fff !important;
+}
+
+.scan-spinner {
+  display: block;
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: scanSpin 0.8s linear infinite;
+}
+
+@keyframes scanSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.main-mic-btn.doc-mic-ready {
+  animation: docMicPulse 2s ease-in-out infinite;
+}
+
+.doc-preview-section {
+  margin-bottom: 12px;
+}
+
+.doc-text-preview.compact {
+  max-height: 50px;
+  margin-bottom: 8px;
+}
+
+@keyframes docMicPulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 4px rgba(4, 120, 87, 0.18),
+      0 0 0 8px rgba(4, 120, 87, 0.07);
+  }
+
+  50% {
+    box-shadow:
+      0 0 0 7px rgba(4, 120, 87, 0.24),
+      0 0 0 14px rgba(4, 120, 87, 0.05);
+  }
+}

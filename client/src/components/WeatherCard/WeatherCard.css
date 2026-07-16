@@ -1,0 +1,66 @@
+.weather-card-kpi {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 16px 20px;
+    cursor: pointer;
+    position: relative;
+    border: 1px solid var(--border-light);
+    background: var(--bg-card);
+    min-width: 280px;
+    transition: all var(--transition-base);
+}
+
+.weather-kpi-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.weather-kpi-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.weather-kpi-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-tertiary);
+}
+
+.weather-kpi-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+.weather-kpi-arrow {
+    color: var(--text-tertiary);
+    transition: transform 0.2s ease;
+}
+
+.weather-card-kpi:hover .weather-kpi-arrow {
+    transform: translateX(4px);
+    color: var(--agri-primary);
+}
+
+.weather-card-kpi:hover {
+    background: var(--bg-hover);
+    border-color: var(--agri-primary-light);
+}
+
+@media (max-width: 768px) {
+    .weather-card-kpi {
+        width: 100%;
+    }
+}

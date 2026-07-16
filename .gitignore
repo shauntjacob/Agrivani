@@ -1,0 +1,166 @@
+# =============================================================================
+# AgriVani — Python + FastAPI + React/Vite + PyTorch + ChromaDB
+# =============================================================================
+
+# --- Python virtual environments ---
+.venv/
+venv/
+ENV/
+env/
+backend/.venv/
+backend/venv/
+
+# --- Python bytecode & caches ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+pip-wheel-metadata/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- Node.js (React/Vite frontend) ---
+node_modules/
+client/node_modules/
+client/dist/
+client/dist-ssr/
+*.local
+.npm/
+.yarn/
+.pnp.*
+package-lock.json.bak
+
+# --- Environment variables & credentials (NEVER commit real values) ---
+.env
+.env.*
+!.env.example
+!**/.env.example
+backend/.env
+backend/.env.local
+client/.env
+client/.env.local
+serviceAccountKey.json
+backend/serviceAccountKey.json
+**/serviceAccountKey.json
+!**/serviceAccountKey.json.example
+*.pem
+*.key
+*.p12
+credentials.json
+secrets.json
+
+# --- Firebase / cloud service keys ---
+firebase-adminsdk*.json
+google-services.json
+GoogleService-Info.plist
+
+# --- SQLite databases & local data stores ---
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+backend/data/*.db
+backend/data/chat_history.db
+backend/data/prices.db
+backend/data/fallback_prices.db
+backend/data/sync_history.db
+backend/data/market_analysis.db
+backend/data/market_news.db
+backend/market_analysis.db
+
+# --- ChromaDB persistent vector storage (rebuilt by crawlers) ---
+backend/chroma_db/
+backend/data/chroma_db/
+chroma_db/
+
+# --- Machine learning model weights (download separately) ---
+backend/models/*
+!backend/models/.gitkeep
+*.pth
+*.pt
+*.ckpt
+*.onnx
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.safetensors
+*.bin
+glow.zip
+hifi.zip
+
+# Plant disease detection weights
+backend/models/Plant_Dataset_Model_Backup/
+efficientnet_v2_s_finetune_best.pth
+efficientnet_v2_s_finetune_classes.json
+
+# Vakyansh TTS models (downloaded via download_models.py)
+backend/models/mr_0_glow/
+backend/models/mr_1_hifi/
+
+# HuggingFace / sentence-transformers model cache
+.cache/
+huggingface/
+sentence_transformers/
+~/.cache/huggingface/
+
+# --- Runtime uploads, audio cache, ASR temp files ---
+backend/data/uploads/
+backend/data/audio_cache/
+backend/data/asr_temp/
+backend/data/response_cache.json
+backend/data/*.log
+backend/data/crawled_history.log
+backend/data/crop_crawled_history.log
+backend/source.html
+
+# --- Crawler state (regenerated on boot) ---
+backend/crawl_status.json
+
+# --- OCR / scraper tooling (machine-specific paths in code) ---
+# Tesseract & Poppler are system installs — not committed
+
+# --- Logs ---
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- OS & editor files ---
+.DS_Store
+Thumbs.db
+Desktop.ini
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# --- Jupyter / notebook checkpoints ---
+.ipynb_checkpoints/
+
+# --- NeMo ASR dependency (lives OUTSIDE this repo — see README) ---
+# If accidentally copied inside AgriVani, ignore it:
+NeMo/
+nemo/
+
+# --- Crawl queue / scraped text data ---
+backend/data/queue_*.txt
+backend/data/*.txt

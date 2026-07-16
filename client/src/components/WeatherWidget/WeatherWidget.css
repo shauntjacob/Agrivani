@@ -1,0 +1,245 @@
+@import '../../styles/agrivani-design-system.css';
+
+.weather-header-pill {
+    position: relative;
+    display: flex;
+    align-items: center;
+    z-index: 1000;
+}
+
+.pill-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-light);
+    padding: 2px 12px;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    user-select: none;
+    height: 38px;
+    box-shadow: var(--shadow-sm);
+}
+
+.pill-content:hover {
+    background: var(--bg-hover);
+    border-color: var(--agri-primary-light);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.pill-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pill-temp {
+    font-size: 14px;
+    font-weight: var(--font-weight-bold);
+    color: var(--agri-primary);
+    /* Use theme emerald for text */
+}
+
+.pill-arrow {
+    color: var(--agri-primary-light);
+    transition: transform 0.3s ease;
+}
+
+.pill-arrow.rotate {
+    transform: rotate(180deg);
+}
+
+/* Dropdown Modal - Light Premium Design */
+.weather-dropdown-modal {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: 320px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: var(--shadow-lg);
+    animation: slideDownFade 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 1001;
+}
+
+@keyframes slideDownFade {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    border-bottom: 1.5px solid var(--bg-hover);
+    padding-bottom: 12px;
+}
+
+.location-name {
+    font-size: 18px;
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+}
+
+.condition-text {
+    font-size: 14px;
+    color: var(--text-secondary);
+    text-transform: capitalize;
+    font-weight: var(--font-weight-medium);
+}
+
+/* Agri Advisory Box */
+.agri-advisory-box {
+    background: var(--bg-main);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    margin-bottom: 16px;
+    border-left: 4px solid var(--agri-primary);
+}
+
+.agri-advisory-box.success {
+    border-left-color: var(--agri-growth);
+    background: rgba(16, 185, 129, 0.05);
+}
+
+.agri-advisory-box.caution {
+    border-left-color: var(--agri-accent);
+    background: rgba(245, 158, 11, 0.05);
+}
+
+.agri-advisory-box.warning {
+    border-left-color: #ef4444;
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.advisory-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 12px;
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-secondary);
+}
+
+.advisory-badge {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    color: white;
+    font-weight: var(--font-weight-extrabold);
+}
+
+.advisory-badge.success {
+    background: var(--agri-growth);
+}
+
+.advisory-badge.caution {
+    background: var(--agri-accent);
+}
+
+.advisory-badge.warning {
+    background: #ef4444;
+}
+
+.advisory-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    /* Refined from primary to avoid too much weight */
+    margin-bottom: 14px;
+}
+
+.ai-discuss-btn {
+    width: 100%;
+    background: var(--agri-gradient-emerald);
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: var(--font-weight-extrabold);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 15px rgba(4, 132, 94, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.ai-discuss-btn:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 10px 25px rgba(4, 132, 94, 0.4);
+    background: var(--agri-primary-light);
+}
+
+.ai-discuss-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Details Grid */
+.weather-details {
+    display: flex;
+    gap: 12px;
+}
+
+.detail-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--bg-input);
+    padding: 10px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    color: var(--text-primary);
+    font-weight: var(--font-weight-semibold);
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .weather-dropdown-modal {
+        position: fixed;
+        top: 80px;
+        left: 20px;
+        right: 20px;
+        width: auto;
+        margin: 0;
+    }
+
+    .pill-temp {
+        display: none;
+    }
+
+    .pill-arrow {
+        display: none;
+    }
+
+    .pill-content {
+        padding: 4px 10px;
+        gap: 4px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pill-content {
+        height: 32px;
+    }
+}

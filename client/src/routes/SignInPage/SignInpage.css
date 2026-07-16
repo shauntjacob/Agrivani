@@ -1,0 +1,145 @@
+/* SignInPage — Aligned with Homepage Theme */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+.signInPage {
+    --hp-bg: var(--bg-main);
+    --hp-text: var(--text-primary);
+    --hp-muted: var(--text-secondary);
+    --glass-bg: var(--bg-card);
+    --glass-border: var(--border-light);
+    --glass-border-hi: var(--agri-primary-light);
+    --font-body: var(--font-family);
+
+    min-height: 100vh;
+    width: 100%;
+    background-color: var(--hp-bg);
+    color: var(--hp-text);
+    font-family: var(--font-body);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    transition: background-color var(--transition-base), color var(--transition-base);
+}
+
+/* ── Ambient blobs ── */
+.signInPage .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(110px);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.signInPage .blob-1 {
+    width: 480px;
+    height: 480px;
+    background: radial-gradient(circle, rgba(0, 196, 106, 0.16) 0%, transparent 70%);
+    top: -80px;
+    left: -80px;
+    animation: blobDriftAuth1 14s ease-in-out infinite alternate;
+}
+
+.signInPage .blob-2 {
+    width: 360px;
+    height: 360px;
+    background: radial-gradient(circle, rgba(0, 140, 114, 0.12) 0%, transparent 70%);
+    bottom: -50px;
+    right: 5%;
+    animation: blobDriftAuth2 18s ease-in-out infinite alternate;
+}
+
+.signInPage .blob-3 {
+    width: 280px;
+    height: 280px;
+    background: radial-gradient(circle, rgba(13, 79, 47, 0.2) 0%, transparent 70%);
+    top: 40%;
+    left: 48%;
+    transform: translate(-50%, -50%);
+    animation: blobDriftAuth3 11s ease-in-out infinite alternate;
+}
+
+@keyframes blobDriftAuth1 {
+    from {
+        transform: translate(0, 0) scale(1);
+    }
+
+    to {
+        transform: translate(50px, 30px) scale(1.08);
+    }
+}
+
+@keyframes blobDriftAuth2 {
+    from {
+        transform: translate(0, 0);
+    }
+
+    to {
+        transform: translate(-40px, -50px) scale(1.12);
+    }
+}
+
+@keyframes blobDriftAuth3 {
+    from {
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    to {
+        transform: translate(-50%, -50%) scale(1.15);
+    }
+}
+
+/* ── Waveforms ── */
+.signInPage .waveform {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.signInPage .waveform-top {
+    top: 0;
+    height: 120px;
+    opacity: 0.3;
+}
+
+.signInPage .waveform-bottom {
+    bottom: 0;
+    height: 120px;
+    opacity: 0.2;
+    transform: scaleY(-1);
+}
+
+/* Dark mode overrides for blobs/waveforms to keep them vibrant */
+[data-theme='dark'] .signInPage {
+    --glass-bg: rgba(0, 196, 106, 0.06);
+    --glass-border-hi: rgba(0, 255, 170, 0.28);
+}
+
+[data-theme='dark'] .signInPage .waveform-top {
+    opacity: 0.6;
+}
+
+[data-theme='dark'] .signInPage .waveform-bottom {
+    opacity: 0.4;
+}
+
+.signInPage .auth-container {
+    position: relative;
+    z-index: 10;
+    animation: fadeUpAuth 0.8s ease backwards;
+}
+
+@keyframes fadeUpAuth {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

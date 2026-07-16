@@ -1,0 +1,34 @@
+/* Transparent wrapper — layout comes entirely from parent (NewPrompt) */
+.doc-upload-root {
+    display: contents;
+}
+
+/* Fallback default button (only shown when renderCustom is not provided) */
+.doc-upload-default-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform .15s ease;
+}
+
+.doc-upload-default-btn:hover {
+    transform: scale(1.1);
+}
+
+.doc-upload-default-btn.status-reading {
+    cursor: not-allowed;
+    animation: docSpin 1s linear infinite;
+}
+
+@keyframes docSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
