@@ -271,26 +271,10 @@ cd client && npm run dev
 ollama serve
 ollama pull llava qwen2.5:3b gemma2:2b
 ```
-
----
-
-## Security — Before Making Public
-
-Remove or move these hardcoded values **before pushing to GitHub**:
-
-1. `client/src/lib/firebase.js` — Firebase client config (API key, project ID)
-2. `backend/alert_engine.py` — Gmail sender email and app password
-3. `backend/voice_engine.py` — Tailscale IP fallback for ASR
-4. `backend/scheme_engine.py` & `backend/crop_data.py` — Machine-specific Tesseract/Poppler paths
-5. Never commit `serviceAccountKey.json` with real credentials
-6. Never commit `.env` files with real API keys
-
----
-
-## License
-
-Add your license here (e.g. MIT).
-
 ## Author
 
-Your Name — [GitHub](https://github.com/your-username)
+   Built by:
+   - Bipin Balkrishna Patil
+   - Sarvesh Sanjay Sawant
+   - Shaun Thomas Jacob     
+   - Ron Gibson Vincelal Joe
