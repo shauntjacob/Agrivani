@@ -1,6 +1,6 @@
 # AgriVani
 
-**AI-powered agricultural assistant for Indian farmers** — Marathi voice interaction, mandi price forecasting, crop disease detection, government scheme search, and offline-first support, powered by a federated multi-node local LLM deployment.
+**AI-powered agricultural assistant for Indian farmers** — Marathi/English voice interaction, mandi price forecasting, crop disease detection, government scheme search, and offline-first support, powered by a federated multi-node local LLM deployment.
 
 ---
 
