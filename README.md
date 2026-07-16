@@ -1,19 +1,19 @@
 # AgriVani
 
-**AI-powered agricultural assistant for Indian farmers** — Marathi/English voice interaction, mandi price forecasting, crop disease detection, government scheme search, and offline-first support, powered by a federated multi-node local LLM deployment.
+**AI-powered agricultural assistant for Indian farmers** — Marathi/English voice interaction, market price forecasting, crop disease detection, government scheme search, and hybrid local/cloud support, powered by a federated multi-node local LLM deployment.
 
 ---
 
 ## Features
 
 - **Conversational AI** — Agentic chat with NLU-based intent detection (prices, weather, schemes, disease, general Q&A)
-- **Mandi price tracker** — Live APMC prices from the Data.gov.in API, with Prophet-based 7-day price forecasting
+- **Market price tracker** — Live APMC prices from the Data.gov.in API, with Prophet-based 7-day price forecasting
 - **Price alerts** — Set crop price targets; email notifications when thresholds are hit
 - **Plant disease detection** — Upload a crop/leaf photo; a fine-tuned EfficientNetV2-S (CNN) model classifies the disease across a 38-class taxonomy (tomato, rice, maize, potato) and returns confidence scores plus treatment suggestions, cross-checked with a LLaVA vision pass
 - **Government scheme RAG** — ChromaDB-backed semantic search over government scheme websites and PDFs, crawled with Crawl4AI (async web crawler) and OCR'd where needed
-- **Multilingual support** — Marathi voice input via the Vyakyansh ASR model (client-side), translated to English via the `deep-translator` (Google Translate) library for intent processing; responses are converted to Marathi speech using gTTS
+- **Multilingual support** — Voice input in Marathi is captured via the Vyakyansh ASR model (client-side) and translated to English via the `deep-translator` (Google Translate) library for intent processing. Language is mirrored on the way out: a Marathi query gets a Marathi voice/text response (via gTTS), while an English query gets an English response — the farmer never has to switch languages mid-conversation
 - **Weather forecasts** — Open-Meteo integration for temperature, rainfall, and wind speed
-- **Offline-first client** — IndexedDB (Dexie) cache with a sync queue for chats, prices, and voice, so the app stays usable in low-connectivity rural areas
+- **Resilient client experience** — An IndexedDB (Dexie) cache with a sync queue keeps the chat, prices, and voice data smooth in the app. If connectivity drops mid-query, the UI stays fully responsive instead of breaking or freezing — the farmer's submitted query is held in the indexed queue and automatically sent once the connection is back, so nothing is lost in low-connectivity rural areas
 - **Farmer profiles** — Firebase Auth + Firestore for crops, location, and chat history
 - **Media handling** — Cloudinary and ImageKit for crop image storage and delivery
 
@@ -57,18 +57,18 @@ AgriVani runs as a **Federated Multi-Node Architecture**, with three machines co
    ┌─────────▼──────────────────────────────────────────────────────────┐
    │                       React/Vite Frontend (client/)                 │
    │  Auth (Firebase) │ Chat UI │ Prices │ Disease Upload │ Voice        │
-   │  IndexedDB cache │ Offline sync queue                               │
+   │  IndexedDB cache │ Sync queue                                       │
    └───────────────────────────────────────────────────────────────────┘
 ```
 
 **Voice input path:**
-Farmer speaks (Marathi) → audio preprocessing → Vyakyansh ASR → text translated to English via `deep-translator` → NLU intent classification → RAG / price / weather / scheme lookup → response generated → translated back and delivered as Marathi speech (gTTS) → saved to Firestore + client cache.
+Farmer speaks (Marathi or English) → audio preprocessing → Vyakyansh ASR → text translated to English via `deep-translator` (if needed) for NLU intent classification → RAG / price / weather / scheme lookup → response generated → response is delivered back in the same language the farmer used — Marathi speech via gTTS for a Marathi query, English for an English query → saved to Firestore + client cache.
 
 **Image input path:**
 Farmer uploads/captures crop image → preprocessing (resize, noise removal, color correction) → image sent to LLaVA (Vision Node) for description **and** to the EfficientNetV2-S classifier (Orchestrator Node) for disease classification → confidence score computed → treatment advisory retrieved from knowledge base → llama3.1:8b (Inference Node) synthesizes the final farmer-facing response.
 
 **Knowledge base:**
-ChromaDB stores chunked government scheme documents (both web-scraped text and OCR'd PDFs), populated by a Crawl4AI async crawler. Embeddings are generated with `paraphrase-multilingual-MiniLM-L12-v2` (Sentence-Transformers), enabling multilingual Marathi/English similarity search. Mandi prices are stored in SQLite and forecast 7 days ahead using Prophet.
+ChromaDB stores chunked government scheme documents (both web-scraped text and OCR'd PDFs), populated by a Crawl4AI async crawler. Embeddings are generated with `paraphrase-multilingual-MiniLM-L12-v2` (Sentence-Transformers), enabling multilingual Marathi/English similarity search. Market prices are stored in SQLite and forecast 7 days ahead using Prophet.
 
 ---
 
@@ -78,7 +78,7 @@ ChromaDB stores chunked government scheme documents (both web-scraped text and O
 AgriVani/
 ├── backend/                    # FastAPI Python backend (Orchestrator Node)
 │   ├── server.py               # Main API server & agent orchestration
-│   ├── price_engine.py         # Mandi prices, Prophet forecasting, SQLite
+│   ├── price_engine.py         # Market prices, Prophet forecasting, SQLite
 │   ├── scheme_engine.py        # Crawl4AI-based govt scheme crawler + ChromaDB RAG
 │   ├── crop_data.py            # Crop disease/treatment knowledge crawler
 │   ├── nlu_engine.py           # Intent extraction
@@ -207,7 +207,7 @@ Point the Orchestrator's `.env` at the Tailscale IPs/hostnames of the Vision and
 
 | Variable | Purpose |
 |----------|---------|
-| `MARKET_PRICE` | Data.gov.in API key for mandi prices |
+| `MARKET_PRICE` | Data.gov.in API key for market prices |
 | `GEOAPIFY_KEY` | Geocoding (APMC coordinate lookup) |
 | `GOVT_API_KEY` | Additional government data API |
 | `IMAGE_KIT_ENDPOINT` | ImageKit CDN endpoint |
@@ -243,7 +243,7 @@ Firebase client config should also be moved to environment variables (see Securi
 | `POST` | `/api/transcribe` | Speech-to-text (Vyakyansh) |
 | `POST` | `/voice-ask` | Voice input → chat response |
 | `GET/POST` | `/api/chats/*` | Chat CRUD (Firestore) |
-| `GET` | `/api/prices/{crop}` | Mandi prices for a crop |
+| `GET` | `/api/prices/{crop}` | Market prices for a crop |
 | `GET` | `/api/prices/predict/{crop}` | 7-day price forecast (Prophet) |
 | `GET/POST/DELETE` | `/api/prices/alerts` | Price alert management |
 | `GET/POST` | `/api/profile/*` | Farmer profile read/update |
@@ -273,12 +273,6 @@ ollama pull llava llama3.1:8b qwen2.5:3b
 - Plant disease detection accuracy depends on lighting, image quality, and background complexity; the model is trained on a limited (~18 GB) dataset covering four crops.
 - The government scheme knowledge base depends on a fixed set of crawled sources and may not cover all crops, regions, or newly introduced schemes.
 - Speech recognition accuracy has been validated primarily for standard Marathi and may vary across regional dialects.
-
-## Future Scope
-
-- Extend language support beyond Marathi (Tamil, Telugu, Gujarati, Bengali).
-- Move from web scraping to authenticated API integrations with government data sources (Open-Meteo, ICAR, eNAM) where available.
-- Add personalized recommendations based on farm size, location, and crop history.
 
 ---
 
