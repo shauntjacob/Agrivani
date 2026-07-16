@@ -1,21 +1,21 @@
 # AgriVani
 
-**AI-powered agricultural assistant for Indian farmers** — multilingual chat, mandi prices, crop disease detection, government scheme search, and voice support.
+**AI-powered agricultural assistant for Indian farmers** — Marathi voice interaction, mandi price forecasting, crop disease detection, government scheme search, and offline-first support, powered by a federated multi-node local LLM deployment.
 
 ---
 
 ## Features
 
-- **Conversational AI** — Agentic chat with intent planning (prices, weather, schemes, disease, general Q&A)
-- **Mandi price tracker** — Live APMC prices from data.gov.in with Prophet-based forecasting
-- **Plant disease detection** — Upload a crop photo; vision AI diagnoses disease and suggests treatment via RAG
-- **Government scheme RAG** — ChromaDB-backed semantic search over crawled agri-gov websites and PDFs
-- **Crop knowledge base** — Separate ChromaDB index for pest/disease treatment manuals
-- **Multilingual support** — Marathi ↔ English translation; Marathi TTS (Vakyansh) and ASR (IndicConformer)
-- **Weather forecasts** — Open-Meteo (backend) and OpenWeatherMap (frontend widget)
+- **Conversational AI** — Agentic chat with NLU-based intent detection (prices, weather, schemes, disease, general Q&A)
+- **Mandi price tracker** — Live APMC prices from the Data.gov.in API, with Prophet-based 7-day price forecasting
 - **Price alerts** — Set crop price targets; email notifications when thresholds are hit
-- **Offline-first client** — IndexedDB (Dexie) cache with sync queue for chats, prices, and voice
+- **Plant disease detection** — Upload a crop/leaf photo; a fine-tuned EfficientNetV2-S (CNN) model classifies the disease across a 38-class taxonomy (tomato, rice, maize, potato) and returns confidence scores plus treatment suggestions, cross-checked with a LLaVA vision pass
+- **Government scheme RAG** — ChromaDB-backed semantic search over government scheme websites and PDFs, crawled with Crawl4AI (async web crawler) and OCR'd where needed
+- **Multilingual support** — Marathi voice input via the Vyakyansh ASR model (client-side), translated to English via the `deep-translator` (Google Translate) library for intent processing; responses are converted to Marathi speech using gTTS
+- **Weather forecasts** — Open-Meteo integration for temperature, rainfall, and wind speed
+- **Offline-first client** — IndexedDB (Dexie) cache with a sync queue for chats, prices, and voice, so the app stays usable in low-connectivity rural areas
 - **Farmer profiles** — Firebase Auth + Firestore for crops, location, and chat history
+- **Media handling** — Cloudinary and ImageKit for crop image storage and delivery
 
 ---
 
@@ -24,48 +24,51 @@
 | Layer | Technologies |
 |-------|-------------|
 | **Frontend** | React 19, Vite 6, React Router 7, Dexie (IndexedDB), Recharts |
-| **Backend** | FastAPI, Uvicorn, APScheduler, LangChain, Ollama |
-| **ML / AI** | PyTorch (EfficientNet-V2), Ollama (Llava, Qwen2.5, Gemma2), Sentence-Transformers |
+| **Backend** | FastAPI, Uvicorn, APScheduler, LangChain (embeddings/vector store integration) |
+| **ML / AI** | PyTorch (EfficientNetV2-S), Ollama (llama3.1:8b, qwen2.5:3b, LLaVA), Sentence-Transformers |
 | **Vector DB** | ChromaDB (persistent local storage) |
+| **Speech** | Vyakyansh (ASR, client-side), gTTS (Marathi TTS), deep-translator (Marathi ↔ English) |
 | **Auth & Data** | Firebase Auth + Firestore |
 | **Media** | Cloudinary, ImageKit |
-| **ASR (optional)** | NVIDIA NeMo / AI4Bharat IndicConformer (separate service) |
-| **TTS** | Vakyansh Glow-TTS + HiFi-GAN (Marathi) |
+| **Networking** | Tailscale (private mesh VPN linking federated inference nodes) |
+| **Data Sources** | Data.gov.in APMC API, Open-Meteo, government scheme portals (crawled) |
 
 ---
 
 ## Architecture
 
+AgriVani runs as a **Federated Multi-Node Architecture**, with three machines communicating over a private Tailscale mesh VPN (encrypted, low-latency, no internet dependency between nodes):
+
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                     React/Vite Frontend (client/)               │
-│  Auth (Firebase) │ Chat UI │ Prices │ Disease Upload │ Voice  │
-│  IndexedDB cache │ Offline sync queue                         │
-└──────────────────────────┬──────────────────────────────────────┘
-                           │ REST / SSE
-┌──────────────────────────▼──────────────────────────────────────┐
-│                   FastAPI Backend (backend/server.py)             │
-│  ┌─────────────┐  ┌──────────────┐  ┌────────────────────────┐  │
-│  │ Agent       │  │ Disease      │  │ Price Engine           │  │
-│  │ Planner     │  │ Detection    │  │ (SQLite + Prophet)     │  │
-│  │ (Ollama)    │  │ (Llava+Chroma)│  │ data.gov.in API       │  │
-│  └──────┬──────┘  └──────┬───────┘  └───────────┬────────────┘  │
-│         │                │                       │               │
-│  ┌──────▼────────────────▼───────────────────────▼────────────┐  │
-│  │              ChromaDB (data/chroma_db/)                    │  │
-│  │  schemes_web │ schemes_pdf │ crop_knowledge_web │ crop_pdf │  │
-│  └────────────────────────────────────────────────────────────┘  │
-└──────────┬──────────────────┬──────────────────┬─────────────────┘
-           │                  │                  │
-    ┌──────▼──────┐   ┌───────▼───────┐  ┌──────▼──────┐
-    │  Firebase   │   │ Ollama LLM    │  │ ASR Server  │
-    │  Firestore  │   │ (local/remote)│  │ (NeMo, opt) │
-    └─────────────┘   └───────────────┘  └─────────────┘
+┌───────────────────────────────────────────────────────────────────────┐
+│                    Federated Multi-Node Architecture                  │
+│                     (Tailscale Private Mesh VPN)                      │
+│                                                                         │
+│   ┌────────────────┐     ┌────────────────┐     ┌───────────────────┐ │
+│   │ Orchestrator   │◄───►│ Vision Node    │◄───►│ Inference Node    │ │
+│   │ Node (Laptop 1)│     │ (Laptop 2)     │     │ (Laptop 3)         │ │
+│   │ FastAPI        │     │ LLaVA          │     │ llama3.1:8b        │ │
+│   │ Routing, API   │     │ (multimodal    │     │ (via Ollama)       │ │
+│   │ management     │     │ image analysis)│     │ Reasoning, advisory│ │
+│   │                │     │                │     │ synthesis          │ │
+│   └────────┬───────┘     └────────────────┘     └────────────────────┘ │
+└────────────┼───────────────────────────────────────────────────────────┘
+             │
+   ┌─────────▼──────────────────────────────────────────────────────────┐
+   │                       React/Vite Frontend (client/)                 │
+   │  Auth (Firebase) │ Chat UI │ Prices │ Disease Upload │ Voice        │
+   │  IndexedDB cache │ Offline sync queue                               │
+   └───────────────────────────────────────────────────────────────────┘
 ```
 
-**Request flow (chat):** User message → `/ask` → NLU planner picks actions → tools fetch prices/weather/schemes/disease data → Ollama streams final answer → saved to Firestore + client cache.
+**Voice input path:**
+Farmer speaks (Marathi) → audio preprocessing → Vyakyansh ASR → text translated to English via `deep-translator` → NLU intent classification → RAG / price / weather / scheme lookup → response generated → translated back and delivered as Marathi speech (gTTS) → saved to Firestore + client cache.
 
-**Disease flow:** Image upload → `/api/predict-disease` → Llava vision (crop + disease) → ChromaDB treatment lookup → Ollama advice → bilingual response.
+**Image input path:**
+Farmer uploads/captures crop image → preprocessing (resize, noise removal, color correction) → image sent to LLaVA (Vision Node) for description **and** to the EfficientNetV2-S classifier (Orchestrator Node) for disease classification → confidence score computed → treatment advisory retrieved from knowledge base → llama3.1:8b (Inference Node) synthesizes the final farmer-facing response.
+
+**Knowledge base:**
+ChromaDB stores chunked government scheme documents (both web-scraped text and OCR'd PDFs), populated by a Crawl4AI async crawler. Embeddings are generated with `paraphrase-multilingual-MiniLM-L12-v2` (Sentence-Transformers), enabling multilingual Marathi/English similarity search. Mandi prices are stored in SQLite and forecast 7 days ahead using Prophet.
 
 ---
 
@@ -73,51 +76,52 @@
 
 ```
 AgriVani/
-├── backend/                    # FastAPI Python backend
+├── backend/                    # FastAPI Python backend (Orchestrator Node)
 │   ├── server.py               # Main API server & agent orchestration
 │   ├── price_engine.py         # Mandi prices, Prophet forecasting, SQLite
-│   ├── scheme_engine.py        # Govt scheme crawler + ChromaDB RAG
-│   ├── crop_data.py            # Crop disease/treatment knowledge crawler + RAG
-│   ├── knowledge_base.py       # Legacy LangChain-based scheme RAG
-│   ├── nlu_engine.py           # Intent extraction (Ollama gemma2)
-│   ├── voice_engine.py         # STT/TTS + Marathi translation
+│   ├── scheme_engine.py        # Crawl4AI-based govt scheme crawler + ChromaDB RAG
+│   ├── crop_data.py            # Crop disease/treatment knowledge crawler
+│   ├── nlu_engine.py           # Intent extraction
+│   ├── voice_engine.py         # Vyakyansh ASR handling, gTTS, Marathi/English translation
 │   ├── weather_engine.py       # Open-Meteo forecasts
-│   ├── news_engine.py          # Google News RSS + sentiment
 │   ├── alert_engine.py         # Gmail price alert emails
 │   ├── firebase_engine.py      # Firebase Admin SDK init
-│   ├── asr_server.py           # Standalone IndicConformer ASR (runs on GPU machine)
-│   ├── download_models.py      # Downloads Vakyansh TTS weights
 │   ├── data/                   # JSON configs, SQLite DBs, ChromaDB, crawl queues
-│   ├── models/                 # TTS + plant disease PyTorch weights (gitignored)
-│   ├── scripts/                # Data pipeline utilities (ETL, analysis, migration)
-│   └── tts_infer/              # Vakyansh TTS inference helpers
+│   ├── models/                 # Plant disease PyTorch weights (gitignored)
+│   └── scripts/                # Data pipeline utilities (ETL, analysis, migration)
 ├── client/                     # React/Vite frontend
 │   ├── src/
 │   │   ├── routes/             # Page components (Home, Dashboard, Chat, Prices…)
 │   │   ├── components/         # Reusable UI (Chat, Upload, Weather, Alerts…)
 │   │   ├── layout/             # RootLayout, DashboardLayout
 │   │   ├── context/            # Auth, Language, Theme providers
-│   │   ├── hooks/              # useSpeechToText
+│   │   ├── hooks/               # useSpeechToText
 │   │   └── lib/                # API clients, Firebase, Dexie, market services
 │   ├── public/
 │   └── package.json
+├── vision_node/                 # LLaVA multimodal service (runs on Laptop 2)
+├── inference_node/               # llama3.1:8b via Ollama (runs on Laptop 3)
 ├── .gitignore
 └── README.md
 ```
 
-> **Note:** The `NeMo/` folder in the parent workspace is a **separate dependency** for the optional ASR server. Do **not** include it in this repository.
+> **Note:** The Vision Node and Inference Node are intended to run on separate machines on the same Tailscale network. They are not required to be colocated with the Orchestrator, and the folder layout above should be adapted based on how you split the services across machines.
 
 ---
 
 ## Prerequisites
 
-- **Python** 3.10 – 3.12
-- **Node.js** 18+ (tested with 24.x)
-- **Ollama** with models: `llava`, `qwen2.5:3b`, `gemma2:2b`
-- **ffmpeg** (audio conversion for STT/TTS)
+- **Operating System:** Windows 10/11 (developed and tested on Windows; other OSes are untested)
+- **Python** 3.9+
+- **Node.js** 18+
+- **Ollama** with models: `llama3.1:8b`, `qwen2.5:3b`, `llava`
+- **Tailscale** account (for connecting the Orchestrator, Vision, and Inference nodes if running on separate machines)
 - **Firebase project** with Auth + Firestore enabled
-- *(Optional)* Tesseract OCR + Poppler (for PDF crawling)
-- *(Optional)* CUDA GPU (for local ASR / PyTorch inference)
+- **Cloudinary** and/or **ImageKit** account for media storage
+- **Hardware (per node):**
+  - Minimum: Intel i3/AMD equivalent, 4 GB RAM, 250 GB HDD
+  - Recommended: Intel i5/i7 or Ryzen 5+, 8 GB+ RAM, 512 GB SSD, NVIDIA GPU with 4 GB+ VRAM (for the Vision/Inference nodes)
+- **Internet:** 2 Mbps minimum, 5 Mbps+ recommended (for data source APIs; inter-node traffic runs over Tailscale, not the public internet)
 
 ---
 
@@ -130,29 +134,18 @@ git clone https://github.com/<your-username>/agrivani.git
 cd agrivani
 ```
 
-### 2. Backend setup
+### 2. Backend setup (Orchestrator Node)
 
 ```bash
 cd backend
 python -m venv .venv
-
-# Windows
-.venv\Scripts\activate
-# macOS/Linux
-source .venv/bin/activate
+.venv\Scripts\activate   # Windows
 
 pip install -r requirements.txt
 ```
 
-**Download TTS models (~150 MB):**
-
-```bash
-python download_models.py
-```
-
 **Add plant disease model weights** (not included in repo):
 
-Place your trained EfficientNet weights in:
 ```
 backend/models/Plant_Dataset_Model_Backup/
   ├── efficientnet_v2_s_finetune_best.pth
@@ -185,20 +178,26 @@ npm run dev
 
 Open **http://localhost:5173**
 
-### 4. (Optional) ASR server on a GPU machine
+### 4. Vision Node (LLaVA) — separate machine
 
 ```bash
-# On a separate machine with CUDA:
-git clone https://github.com/AI4Bharat/NeMo.git
-cd NeMo && git checkout nemo-v2
-pip install -r requirements/requirements_asr.txt
-pip install fastapi uvicorn python-multipart pydub torch torchaudio
-
-# Copy backend/asr_server.py to that machine and run:
-python asr_server.py   # listens on :8001
+# On a machine with Ollama installed, joined to the same Tailscale network:
+ollama pull llava
+ollama serve
 ```
 
-Set `VAKYANSH_ASR_URL` in `backend/.env` to point to that server.
+### 5. Inference Node (llama3.1:8b) — separate machine
+
+```bash
+# On another machine, joined to the same Tailscale network:
+ollama pull llama3.1:8b
+ollama pull qwen2.5:3b
+ollama serve
+```
+
+Point the Orchestrator's `.env` at the Tailscale IPs/hostnames of the Vision and Inference nodes (see Environment Variables below).
+
+> If you don't have separate machines available, all three Ollama models can instead be run on a single machine for local development — the federated multi-node design is a deployment choice, not a hard requirement.
 
 ---
 
@@ -208,9 +207,8 @@ Set `VAKYANSH_ASR_URL` in `backend/.env` to point to that server.
 
 | Variable | Purpose |
 |----------|---------|
-| `MARKET_PRICE` | data.gov.in API key for mandi prices |
+| `MARKET_PRICE` | Data.gov.in API key for mandi prices |
 | `GEOAPIFY_KEY` | Geocoding (APMC coordinate lookup) |
-| `OPENWEATHER_KEY` | OpenWeatherMap (if used server-side) |
 | `GOVT_API_KEY` | Additional government data API |
 | `IMAGE_KIT_ENDPOINT` | ImageKit CDN endpoint |
 | `IMAGE_KIT_PUBLIC_KEY` | ImageKit public key |
@@ -218,10 +216,9 @@ Set `VAKYANSH_ASR_URL` in `backend/.env` to point to that server.
 | `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name |
 | `CLOUDINARY_API_KEY` | Cloudinary API key |
 | `CLOUDINARY_API_SECRET` | Cloudinary API secret |
-| `OLLAMA_LLM_URL` | Ollama base URL for text LLM (default `http://localhost:11434`) |
-| `OLLAMA_CROP_URL` | Ollama URL for crop vision extraction |
-| `OLLAMA_VISION_URL` | Ollama vision API endpoint for disease detection |
-| `VAKYANSH_ASR_URL` | IndicConformer ASR server URL |
+| `OLLAMA_LLM_URL` | Ollama URL for the Inference Node (llama3.1:8b) |
+| `OLLAMA_VISION_URL` | Ollama URL for the Vision Node (LLaVA) |
+| `OLLAMA_CROP_URL` | Ollama URL used for auxiliary crop-related generation (qwen2.5:3b) |
 
 Also place your Firebase Admin SDK JSON at `backend/serviceAccountKey.json`.
 
@@ -230,9 +227,6 @@ Also place your Firebase Admin SDK JSON at `backend/serviceAccountKey.json`.
 | Variable | Purpose |
 |----------|---------|
 | `VITE_API_URL` | Backend base URL (e.g. `http://localhost:8000`) |
-| `VITE_OPENWEATHER_API_KEY` | OpenWeatherMap for weather widget |
-| `VITE_GROQ_API_KEY` | Groq SDK (client-side LLM calls) |
-| `VITE_AI_PUBLIC_KEY` | Google Generative AI API key |
 | `VITE_IMAGE_KIT_ENDPOINT` | ImageKit CDN endpoint |
 | `VITE_IMAGE_KIT_PUBLIC_KEY` | ImageKit public key |
 
@@ -244,13 +238,13 @@ Firebase client config should also be moved to environment variables (see Securi
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `POST` | `/ask` | Main chat agent (streaming SSE) |
-| `POST` | `/api/predict-disease` | Plant disease detection from image |
-| `POST` | `/api/transcribe` | Speech-to-text |
+| `POST` | `/ask` | Main chat agent |
+| `POST` | `/api/predict-disease` | Plant disease detection from image (EfficientNetV2-S + LLaVA) |
+| `POST` | `/api/transcribe` | Speech-to-text (Vyakyansh) |
 | `POST` | `/voice-ask` | Voice input → chat response |
 | `GET/POST` | `/api/chats/*` | Chat CRUD (Firestore) |
 | `GET` | `/api/prices/{crop}` | Mandi prices for a crop |
-| `GET` | `/api/prices/predict/{crop}` | Price forecast |
+| `GET` | `/api/prices/predict/{crop}` | 7-day price forecast (Prophet) |
 | `GET/POST/DELETE` | `/api/prices/alerts` | Price alert management |
 | `GET/POST` | `/api/profile/*` | Farmer profile read/update |
 | `POST` | `/api/translate` | Marathi ↔ English translation |
@@ -261,20 +255,37 @@ Firebase client config should also be moved to environment variables (see Securi
 ## Running Locally (Quick Start)
 
 ```bash
-# Terminal 1 — Backend
+# Terminal 1 — Backend (Orchestrator Node)
 cd backend && .venv\Scripts\activate && uvicorn server:app --reload --port 8000
 
 # Terminal 2 — Frontend
 cd client && npm run dev
 
-# Terminal 3 — Ollama (if not already running)
+# Terminal 3 — Ollama (Vision + Inference, if running locally for dev)
 ollama serve
-ollama pull llava qwen2.5:3b gemma2:2b
+ollama pull llava llama3.1:8b qwen2.5:3b
 ```
+
+---
+
+## Known Limitations
+
+- Plant disease detection accuracy depends on lighting, image quality, and background complexity; the model is trained on a limited (~18 GB) dataset covering four crops.
+- The government scheme knowledge base depends on a fixed set of crawled sources and may not cover all crops, regions, or newly introduced schemes.
+- Speech recognition accuracy has been validated primarily for standard Marathi and may vary across regional dialects.
+
+## Future Scope
+
+- Extend language support beyond Marathi (Tamil, Telugu, Gujarati, Bengali).
+- Move from web scraping to authenticated API integrations with government data sources (Open-Meteo, ICAR, eNAM) where available.
+- Add personalized recommendations based on farm size, location, and crop history.
+
+---
+
 ## Author
 
-   Built by:
-   - Bipin Balkrishna Patil
-   - Sarvesh Sanjay Sawant
-   - Shaun Thomas Jacob     
-   - Ron Gibson Vincelal Joe
+Built by:
+- Bipin Balkrishna Patil
+- Sarvesh Sanjay Sawant
+- Shaun Thomas Jacob
+- Ron Gibson Vincelal Joe
