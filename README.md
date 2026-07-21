@@ -9,7 +9,7 @@
 - **Conversational AI** — Agentic chat with NLU-based intent detection (prices, weather, schemes, disease, general Q&A)
 - **Market price tracker** — Live APMC prices from the Data.gov.in API, with Prophet-based 7-day price forecasting
 - **Price alerts** — Set crop price targets; email notifications when thresholds are hit
-- **Plant disease detection** — Upload a crop/leaf photo; a fine-tuned EfficientNetV2-S (CNN) model classifies the disease across a 38-class taxonomy (tomato, rice, maize, potato) and returns confidence scores plus treatment suggestions, cross-checked with a LLaVA vision pass
+-**Plant disease detection** — Upload a crop/leaf photo; a fine-tuned EfficientNetV2-S (CNN) model classifies the disease across 38 crop–disease classes spanning 14 crop species (including apple, blueberry, cherry, corn/maize, grape, orange, peach, bell pepper, potato, raspberry, soybean, squash, strawberry, and tomato). The system returns confidence scores and treatment suggestions, with predictions further validated using a LLaVA vision-language model for contextual verification.
 - **Government scheme RAG** — ChromaDB-backed semantic search over government scheme websites and PDFs, crawled with Crawl4AI (async web crawler) and OCR'd where needed
 - **Multilingual support** — Voice input in Marathi is captured via the Vyakyansh ASR model (client-side) and translated to English via the `deep-translator` (Google Translate) library for intent processing. Language is mirrored on the way out: a Marathi query gets a Marathi voice/text response (via gTTS), while an English query gets an English response — the farmer never has to switch languages mid-conversation
 - **Weather forecasts** — Open-Meteo integration for temperature, rainfall, and wind speed
@@ -270,7 +270,7 @@ ollama pull llava llama3.1:8b qwen2.5:3b
 
 ## Known Limitations
 
-- Plant disease detection accuracy depends on lighting, image quality, and background complexity; the model is trained on a limited (~18 GB) dataset covering four crops.
+- Plant disease detection accuracy depends on lighting, image quality, and background complexity. During testing, we observed that a few crops with similar leaf structures and disease symptoms were more difficult to classify correctly. For example, corn and wheat have narrow, elongated leaves, and diseases such as rust and leaf blight exhibit similar visual patterns, which can occasionally lead to misclassification.
 - The government scheme knowledge base depends on a fixed set of crawled sources and may not cover all crops, regions, or newly introduced schemes.
 - Speech recognition accuracy has been validated primarily for standard Marathi and may vary across regional dialects.
 
